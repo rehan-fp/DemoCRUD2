@@ -20,7 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Controller implements Initializable{
-    private Label label;
+
     @FXML
     private TextField tfID;
     @FXML
@@ -53,16 +53,27 @@ public class Controller implements Initializable{
 
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        label.setText("Hello World");
+
+
+        if(event.getSource()==btnInsert){
+            insertRecord();
+        }else if (event.getSource()==btnUpdate) {
+            updateRecord();
+        }else if (event.getSource()==btnDelete){
+            updateRecord();
+
+        }
     }
      @Override
     public void initialize(URL url,ResourceBundle rb){
+        showBooks();
+
+
     }
     public Connection getConnection() {
         Connection conn;
         try {
-            conn = DriverManager.getConnection("String");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql","root","");
             return conn;
 
 
@@ -101,8 +112,40 @@ public class Controller implements Initializable{
         colAuthor.setCellValueFactory(new PropertyValueFactory<sample.Books,String>("Author"));
         colYear.setCellValueFactory(new PropertyValueFactory<sample.Books,Integer>("Year"));
         colPages.setCellValueFactory(new PropertyValueFactory<sample.Books,Integer>("Pages"));
+        tvBooks.setItems(list);
 
 
+    }
+    private void insertRecord(){
+        String query="INSERT INTO books VALUE ("+tfID.getText()+",'"+tfTitle.getText()+"','"+tfAuthor.getText()+"',"+tfYear.getText()+"',"+tfPages.getText()+")";
+        executeQuery(query);
+        showBooks();
+    }
+    private void updateRecord(){
+        String query="UPDATE books SET Title='"+tfTitle.getText()+"',Author='"+tfAuthor.getText()+"',Year="+tfYear.getText()+" , Pages="+tfPages.getText()+"WHERE id="+tfID.getText()+"";
+        executeQuery(query);
+        showBooks();
+    }
+    private void deleteRecorde(){
+        String query="DELETE FROM books WHERE ID="+tfTitle.getText()+"";
+        executeQuery(query);
+        showBooks();
+    }
+
+
+    private void executeQuery(String query) {
+        Connection conn=getConnection();
+        Statement st;
+        try {
+            st=conn.createStatement();
+            st.executeUpdate(query);
+
+
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+
+        }
     }
 
 }
